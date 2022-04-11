@@ -493,6 +493,8 @@ insert into t_sys_entitlement values('ENT_C_MAIN', '主页', 'home', '/main', 'M
 
 -- 商户管理
 insert into t_sys_entitlement values('ENT_MCH', '商户管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '30', 'MGR', now(), now());
+    insert into t_sys_entitlement values('ENT_MCH_APPLY', '申请列表', 'profile', '/apply', 'Merchant', 'ML', 0, 1,  'ENT_MCH', '10', 'MGR', now(), now());
+        insert into t_sys_entitlement values('ENT_MCH_APPLY_LIST', '页面：申请列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_APPLY', '0', 'MGR', now(), now());
     insert into t_sys_entitlement values('ENT_MCH_INFO', '商户列表', 'profile', '/mch', 'MchListPage', 'ML', 0, 1,  'ENT_MCH', '10', 'MGR', now(), now());
         insert into t_sys_entitlement values('ENT_MCH_LIST', '页面：商户列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', now(), now());
         insert into t_sys_entitlement values('ENT_MCH_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', now(), now());

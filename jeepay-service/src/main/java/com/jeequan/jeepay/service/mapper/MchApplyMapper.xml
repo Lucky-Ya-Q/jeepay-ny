@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeequan.jeepay.service.mapper.MchApplyMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jeequan.jeepay.core.entity.MchApply">
+        <id column="apply_id" property="applyId" />
+        <result column="mch_name" property="mchName" />
+        <result column="mch_short_name" property="mchShortName" />
+        <result column="contact_name" property="contactName" />
+        <result column="contact_tel" property="contactTel" />
+        <result column="contact_email" property="contactEmail" />
+        <result column="remark" property="remark" />
+        <result column="login_username" property="loginUsername" />
+        <result column="apply_time" property="applyTime" />
+        <result column="audit_state" property="auditState" />
+        <result column="audit_uid" property="auditUid" />
+        <result column="audit_by" property="auditBy" />
+        <result column="audit_time" property="auditTime" />
+        <result column="reject_reason" property="rejectReason" />
+    </resultMap>
+
+</mapper>
