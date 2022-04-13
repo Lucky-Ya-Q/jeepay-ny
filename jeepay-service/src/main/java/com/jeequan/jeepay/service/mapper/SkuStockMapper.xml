@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeequan.jeepay.service.mapper.SkuStockMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jeequan.jeepay.core.entity.SkuStock">
+        <id column="sku_id" property="skuId" />
+        <result column="product_id" property="productId" />
+        <result column="mch_no" property="mchNo" />
+        <result column="name" property="name" />
+        <result column="price" property="price" />
+        <result column="deposit" property="deposit" />
+        <result column="stock" property="stock" />
+    </resultMap>
+
+</mapper>
