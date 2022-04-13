@@ -54,6 +54,12 @@
             </exclusions>
         </dependency>
 
+        <!-- spring-security  -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!-- freemarker -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -73,15 +79,15 @@
         </dependency>
 
         <!--wx_pay  https://github.com/wechat-group/WxJava  -->
-        <dependency>
-            <groupId>com.github.binarywang</groupId>
-            <artifactId>weixin-java-pay</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.github.binarywang</groupId>-->
+<!--            <artifactId>wx-java-pay-spring-boot-starter</artifactId>-->
+<!--        </dependency>-->
 
-        <dependency>
-            <groupId>com.github.binarywang</groupId>
-            <artifactId>weixin-java-mp</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.github.binarywang</groupId>-->
+<!--            <artifactId>wx-java-miniapp-spring-boot-starter</artifactId>-->
+<!--        </dependency>-->
 
         <!-- 生成二维码工具包 zxing -->
         <dependency>
