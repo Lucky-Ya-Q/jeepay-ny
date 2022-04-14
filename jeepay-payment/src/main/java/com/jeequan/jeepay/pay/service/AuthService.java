@@ -15,36 +15,18 @@
  */
 package com.jeequan.jeepay.pay.service;
 
+import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import cn.hutool.core.util.IdUtil;
-import com.jeequan.jeepay.core.cache.ITokenService;
 import com.jeequan.jeepay.core.cache.RedisUtil;
 import com.jeequan.jeepay.core.constants.CS;
-import com.jeequan.jeepay.core.entity.MchInfo;
-import com.jeequan.jeepay.core.entity.SysUser;
-import com.jeequan.jeepay.core.exception.BizException;
-import com.jeequan.jeepay.core.exception.JeepayAuthenticationException;
+import com.jeequan.jeepay.core.entity.WxUser;
 import com.jeequan.jeepay.core.jwt.JWTPayload;
 import com.jeequan.jeepay.core.jwt.JWTUtils;
-import com.jeequan.jeepay.core.model.security.JeeUserDetails;
 import com.jeequan.jeepay.pay.config.SystemYmlConfig;
-import com.jeequan.jeepay.service.impl.MchInfoService;
-import com.jeequan.jeepay.service.impl.SysRoleEntRelaService;
-import com.jeequan.jeepay.service.impl.SysRoleService;
-import com.jeequan.jeepay.service.impl.SysUserService;
-import com.jeequan.jeepay.service.mapper.SysEntitlementMapper;
+import com.jeequan.jeepay.service.mapper.WxUserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
-import java.util.*;
 
 /**
  * 认证Service
@@ -56,32 +38,44 @@ import java.util.*;
 @Slf4j
 @Service
 public class AuthService {
-    @Autowired private SystemYmlConfig systemYmlConfig;
+    @Autowired
+    private SystemYmlConfig systemYmlConfig;
+    @Autowired
+    private WxUserMapper wxUserMapper;
 
     /**
      * 认证
-     * **/
-    public String auth(String username, String password){
+     **/
+    public String auth(WxMaJscode2SessionResult session) {
+        String openid = session.getOpenid();
+        String unionid = session.getUnionid();
+        String sessionKey = session.getSessionKey();
 
-        JeeUserDetails jeeUserDetails = new JeeUserDetails();
+        WxUser wxUser = wxUserMapper.selectOne(WxUser.gw().eq(WxUser::getOpenid, openid));
+        if (wxUser == null) {
+            wxUser = new WxUser();
+            wxUser.setOpenid(openid);
+            wxUser.setUnionid(unionid);
+            wxUser.setSessionKey(sessionKey);
+            wxUserMapper.insert(wxUser);
+        } else {
+            wxUser.setUnionid(unionid);
+            wxUser.setSessionKey(sessionKey);
+            wxUserMapper.updateById(wxUser);
+        }
 
-        //验证通过后 再查询用户角色和权限信息集合
-
-        SysUser sysUser = jeeUserDetails.getSysUser();
-
+        // 生成token
+        String cacheKey = CS.getCacheKeyToken(wxUser.getUserId(), IdUtil.fastUUID());
 
 
-        //生成token
-        String cacheKey = CS.getCacheKeyToken(sysUser.getSysUserId(), IdUtil.fastUUID());
+        // 生成iToken 并放置到缓存
+        RedisUtil.set(cacheKey, wxUser, CS.TOKEN_TIME);
 
-        //生成iToken 并放置到缓存
-        ITokenService.processTokenCache(jeeUserDetails, cacheKey); //处理token 缓存信息
+        JWTPayload jwtPayload = new JWTPayload();
+        jwtPayload.setSysUserId(wxUser.getUserId());
+        jwtPayload.setCacheKey(cacheKey);
 
-        //将信息放置到Spring-security context中
-        UsernamePasswordAuthenticationToken authenticationRest = new UsernamePasswordAuthenticationToken(jeeUserDetails, null, jeeUserDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authenticationRest);
-
-        //返回JWTToken
-        return JWTUtils.generateToken(new JWTPayload(jeeUserDetails), systemYmlConfig.getJwtSecret());
+        // 返回JWTToken
+        return JWTUtils.generateToken(jwtPayload, systemYmlConfig.getJwtSecret());
     }
 }

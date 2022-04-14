@@ -84,10 +84,10 @@
 <!--            <artifactId>wx-java-pay-spring-boot-starter</artifactId>-->
 <!--        </dependency>-->
 
-<!--        <dependency>-->
-<!--            <groupId>com.github.binarywang</groupId>-->
-<!--            <artifactId>wx-java-miniapp-spring-boot-starter</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>com.github.binarywang</groupId>
+            <artifactId>wx-java-miniapp-spring-boot-starter</artifactId>
+        </dependency>
 
         <!-- 生成二维码工具包 zxing -->
         <dependency>

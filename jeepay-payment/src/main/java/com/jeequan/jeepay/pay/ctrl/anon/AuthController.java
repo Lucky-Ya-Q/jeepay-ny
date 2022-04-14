@@ -15,23 +15,18 @@
  */
 package com.jeequan.jeepay.pay.ctrl.anon;
 
-import cn.hutool.core.codec.Base64;
-import cn.hutool.core.lang.UUID;
-import com.alibaba.fastjson.JSONObject;
-import com.jeequan.jeepay.core.aop.MethodLog;
-import com.jeequan.jeepay.core.cache.RedisUtil;
+import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.bean.WxMaJscode2SessionResult;
 import com.jeequan.jeepay.core.constants.CS;
 import com.jeequan.jeepay.core.exception.BizException;
-import com.jeequan.jeepay.core.jwt.JWTPayload;
-import com.jeequan.jeepay.core.jwt.JWTUtils;
 import com.jeequan.jeepay.core.model.ApiRes;
 import com.jeequan.jeepay.pay.ctrl.CommonCtrl;
 import com.jeequan.jeepay.pay.service.AuthService;
-import org.apache.commons.lang3.StringUtils;
+import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -41,23 +36,31 @@ import org.springframework.web.bind.annotation.RestController;
  * @site https://www.jeequan.com
  * @date 2021-04-27 15:50
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/anon/auth")
 public class AuthController extends CommonCtrl {
 
-	@Autowired private AuthService authService;
+    @Autowired
+    private WxMaService wxMaService;
+    @Autowired
+    private AuthService authService;
 
-	/** 用户信息认证 获取iToken  **/
-	@RequestMapping(value = "/validate", method = RequestMethod.POST)
-	@MethodLog(remark = "登录认证")
-	public ApiRes validate() throws BizException {
+    /**
+     * 用户信息认证 获取iToken
+     **/
+    @PostMapping("/validate")
+    public ApiRes validate() throws BizException {
+        WxMaJscode2SessionResult session;
+        try {
+            session = wxMaService.getUserService().getSessionInfo(getValStringRequired("code"));
+        } catch (WxErrorException e) {
+            throw new BizException("登录失败，请重试");
+        }
 
-		String account = "account";
-		String ipassport = "ipassport";
+        // 返回前端 accessToken
+        String accessToken = authService.auth(session);
 
-		// 返回前端 accessToken
-		String accessToken = authService.auth(account, ipassport);
-
-		return ApiRes.ok4newJson(CS.ACCESS_TOKEN_NAME, accessToken);
-	}
+        return ApiRes.ok4newJson(CS.ACCESS_TOKEN_NAME, accessToken);
+    }
 }

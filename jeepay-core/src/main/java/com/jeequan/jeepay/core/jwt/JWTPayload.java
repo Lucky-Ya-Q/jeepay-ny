@@ -40,7 +40,9 @@ public class JWTPayload {
     private Long created;         //创建时间, 格式：13位时间戳
     private String cacheKey;      //redis保存的key
 
-    protected JWTPayload(){}
+    public JWTPayload(){
+        this.setCreated(System.currentTimeMillis());
+    }
 
     public JWTPayload(JeeUserDetails jeeUserDetails){
 

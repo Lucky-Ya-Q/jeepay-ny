@@ -9,3 +9,8 @@ spring:
 isys:
   jwt-secret: ARNXp4MzjOOQqxtv #生成jwt的秘钥。 要求每个系统有单独的秘钥管理机制。
 
+# 公众号配置(必填)
+wx:
+  miniapp:
+    appid: wx9746f383640e9a2c
+    secret: f04dbb98ec6cbeab8abf0d2a28d3ddb6

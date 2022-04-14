@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeequan.jeepay.service.mapper.WxUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.jeequan.jeepay.core.entity.WxUser">
+        <id column="openid" property="openid" />
+        <result column="unionid" property="unionid" />
+        <result column="session_key" property="sessionKey" />
+        <result column="avatar" property="avatar" />
+        <result column="nikename" property="nikename" />
+        <result column="phone" property="phone" />
+    </resultMap>
+
+</mapper>

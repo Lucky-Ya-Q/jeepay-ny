@@ -17,6 +17,7 @@ package com.jeequan.jeepay.pay.secruity;
 
 import com.jeequan.jeepay.core.cache.RedisUtil;
 import com.jeequan.jeepay.core.constants.CS;
+import com.jeequan.jeepay.core.entity.WxUser;
 import com.jeequan.jeepay.core.jwt.JWTPayload;
 import com.jeequan.jeepay.core.jwt.JWTUtils;
 import com.jeequan.jeepay.core.model.security.JeeUserDetails;
@@ -51,22 +52,22 @@ public class JeeAuthenticationTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
 
-        JeeUserDetails jeeUserDetails = commonFilter(request);
+        WxUser wxUser = commonFilter(request);
 
-        if(jeeUserDetails == null){
+        if(wxUser == null){
             chain.doFilter(request, response);
             return;
         }
 
-        //将信息放置到Spring-security context中
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(jeeUserDetails, null, jeeUserDetails.getAuthorities());
+        // 将信息放置到Spring-security context中
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(wxUser, null, null);
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         chain.doFilter(request, response);
     }
 
 
-    private JeeUserDetails commonFilter(HttpServletRequest request){
+    private WxUser commonFilter(HttpServletRequest request){
 
 
         String authToken = request.getHeader(CS.ACCESS_TOKEN_NAME);
@@ -84,8 +85,8 @@ public class JeeAuthenticationTokenFilter extends OncePerRequestFilter {
         }
 
         //根据用户名查找数据库
-        JeeUserDetails jwtBaseUser = RedisUtil.getObject(jwtPayload.getCacheKey(), JeeUserDetails.class);
-        if(jwtBaseUser == null){
+        WxUser wxUser = RedisUtil.getObject(jwtPayload.getCacheKey(), WxUser.class);
+        if(wxUser == null){
             RedisUtil.del(jwtPayload.getCacheKey());
             return null; //数据库查询失败，删除redis
         }
@@ -93,7 +94,7 @@ public class JeeAuthenticationTokenFilter extends OncePerRequestFilter {
         //续签时间
         RedisUtil.expire(jwtPayload.getCacheKey(), CS.TOKEN_TIME);
 
-        return jwtBaseUser;
+        return wxUser;
     }
 
 
