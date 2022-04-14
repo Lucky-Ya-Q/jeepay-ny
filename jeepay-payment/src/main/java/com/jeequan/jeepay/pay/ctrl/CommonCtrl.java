@@ -15,15 +15,9 @@
  */
 package com.jeequan.jeepay.pay.ctrl;
 
-import com.jeequan.jeepay.core.constants.ApiCodeEnum;
-import com.jeequan.jeepay.core.constants.CS;
 import com.jeequan.jeepay.core.ctrls.AbstractCtrl;
-import com.jeequan.jeepay.core.entity.SysUser;
-import com.jeequan.jeepay.core.model.ApiRes;
-import com.jeequan.jeepay.core.model.security.JeeUserDetails;
-import com.jeequan.jeepay.pay.config.SystemYmlConfig;
-import com.jeequan.jeepay.service.impl.SysConfigService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.jeequan.jeepay.core.entity.WxUser;
+import com.jeequan.jeepay.core.model.security.JeeWxUser;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
@@ -35,30 +29,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * @date 2021-04-27 15:50
  */
 public abstract class CommonCtrl extends AbstractCtrl {
-
-    @Autowired
-    protected SystemYmlConfig mainConfig;
-
-    @Autowired
-    private SysConfigService sysConfigService;
-
-    /** 获取当前用户ID */
-    protected JeeUserDetails getCurrentUser(){
-
-        return (JeeUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
-    /** 获取当前商户ID **/
-    protected String getCurrentMchNo() {
-        return getCurrentUser().getSysUser().getBelongInfoId();
-    }
-
     /**
-     * 获取当前用户登录IP
-     * @return
+     * 获取当前用户ID
      */
-    protected String getIp() {
-        return getClientIp();
+    protected JeeWxUser getCurrentUser() {
+        return (JeeWxUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
-
 }

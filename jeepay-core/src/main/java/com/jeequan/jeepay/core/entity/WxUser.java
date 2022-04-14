@@ -1,6 +1,7 @@
 package com.jeequan.jeepay.core.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -66,6 +67,4 @@ public class WxUser implements Serializable {
      * 手机号
      */
     private String phone;
-
-
 }

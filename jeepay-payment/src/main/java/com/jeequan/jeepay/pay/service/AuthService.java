@@ -22,6 +22,7 @@ import com.jeequan.jeepay.core.constants.CS;
 import com.jeequan.jeepay.core.entity.WxUser;
 import com.jeequan.jeepay.core.jwt.JWTPayload;
 import com.jeequan.jeepay.core.jwt.JWTUtils;
+import com.jeequan.jeepay.core.model.security.JeeWxUser;
 import com.jeequan.jeepay.pay.config.SystemYmlConfig;
 import com.jeequan.jeepay.service.mapper.WxUserMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -66,10 +67,8 @@ public class AuthService {
 
         // 生成token
         String cacheKey = CS.getCacheKeyToken(wxUser.getUserId(), IdUtil.fastUUID());
-
-
         // 生成iToken 并放置到缓存
-        RedisUtil.set(cacheKey, wxUser, CS.TOKEN_TIME);
+        RedisUtil.set(cacheKey, new JeeWxUser(wxUser, cacheKey), CS.TOKEN_TIME);
 
         JWTPayload jwtPayload = new JWTPayload();
         jwtPayload.setSysUserId(wxUser.getUserId());

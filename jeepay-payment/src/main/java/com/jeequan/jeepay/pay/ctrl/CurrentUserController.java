@@ -15,31 +15,17 @@
  */
 package com.jeequan.jeepay.pay.ctrl;
 
-import cn.hutool.core.codec.Base64;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.jeequan.jeepay.core.aop.MethodLog;
-import com.jeequan.jeepay.core.cache.ITokenService;
+import com.jeequan.jeepay.core.cache.RedisUtil;
 import com.jeequan.jeepay.core.constants.CS;
-import com.jeequan.jeepay.core.entity.SysEntitlement;
-import com.jeequan.jeepay.core.entity.SysUser;
-import com.jeequan.jeepay.core.exception.BizException;
+import com.jeequan.jeepay.core.entity.WxUser;
 import com.jeequan.jeepay.core.model.ApiRes;
-import com.jeequan.jeepay.core.model.security.JeeUserDetails;
-import com.jeequan.jeepay.core.utils.TreeDataBuilder;
-import com.jeequan.jeepay.service.impl.SysEntitlementService;
-import com.jeequan.jeepay.service.impl.SysUserAuthService;
-import com.jeequan.jeepay.service.impl.SysUserService;
-import org.apache.commons.lang3.StringUtils;
+import com.jeequan.jeepay.core.model.security.JeeWxUser;
+import com.jeequan.jeepay.service.impl.WxUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * 当前登录者的信息相关接口
@@ -50,45 +36,31 @@ import java.util.List;
  * @date 2021-04-27 15:50
  */
 @RestController
-@RequestMapping("api/current")
-public class CurrentUserController extends CommonCtrl{
+@RequestMapping("/api/current")
+public class CurrentUserController extends CommonCtrl {
+    @Autowired
+    private WxUserService wxUserService;
 
-	@Autowired private SysEntitlementService sysEntitlementService;
-	@Autowired private SysUserService sysUserService;
-	@Autowired private SysUserAuthService sysUserAuthService;
+    @GetMapping("/user")
+    public ApiRes currentUserInfo() {
+        return ApiRes.ok(getCurrentUser());
+    }
 
-	@RequestMapping(value="/user", method = RequestMethod.GET)
-	public ApiRes currentUserInfo() {
+    @PutMapping("/user")
+    public ApiRes modifyCurrentUserInfo() {
+        String cacheKey = getCurrentUser().getCacheKey();
+        Long currentUserId = getCurrentUser().getWxUser().getUserId();
 
-		///当前用户信息
-		JeeUserDetails jeeUserDetails = getCurrentUser();
-		SysUser user = jeeUserDetails.getSysUser();
+        // 修改头像和昵称
+        WxUser updateRecord = new WxUser();
+        updateRecord.setUserId(currentUserId);
+        updateRecord.setAvatar(getValString("avatar"));
+        updateRecord.setNikename(getValString("nikename"));
+        wxUserService.updateById(updateRecord);
 
-		//1. 当前用户所有权限ID集合
-		List<String> entIdList = new ArrayList<>();
-		jeeUserDetails.getAuthorities().stream().forEach(r->entIdList.add(r.getAuthority()));
-
-		List<SysEntitlement> allMenuList = new ArrayList<>();    //所有菜单集合
-
-		//2. 查询出用户所有菜单集合 (包含左侧显示菜单 和 其他类型菜单 )
-		if(!entIdList.isEmpty()){
-			allMenuList = sysEntitlementService.list(SysEntitlement.gw()
-					.in(SysEntitlement::getEntId, entIdList)
-					.in(SysEntitlement::getEntType, Arrays.asList(CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER))
-					.eq(SysEntitlement::getSysType, CS.SYS_TYPE.MCH)
-					.eq(SysEntitlement::getState, CS.PUB_USABLE));
-		}
-
-		//4. 转换为json树状结构
-		JSONArray jsonArray = (JSONArray) JSON.toJSON(allMenuList);
-		List<JSONObject> allMenuRouteTree = new TreeDataBuilder(jsonArray,
-				"entId", "pid", "children", "entSort", true)
-				.buildTreeObject();
-
-		//1. 所有权限ID集合
-		user.addExt("entIdList", entIdList);
-		user.addExt("allMenuRouteTree", allMenuRouteTree);
-
-		return ApiRes.ok(getCurrentUser().getSysUser());
-	}
+        // 保存redis最新数据
+        WxUser wxUser = wxUserService.getById(currentUserId);
+        RedisUtil.set(cacheKey, new JeeWxUser(wxUser, cacheKey), CS.TOKEN_TIME);
+        return ApiRes.ok();
+    }
 }
