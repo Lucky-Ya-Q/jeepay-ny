@@ -23,6 +23,7 @@ import com.jeequan.jeepay.core.model.ApiRes;
 import com.jeequan.jeepay.pay.ctrl.CommonCtrl;
 import com.jeequan.jeepay.pay.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
+import me.chanjar.weixin.common.error.WxErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,16 +51,12 @@ public class AuthController extends CommonCtrl {
      **/
     @PostMapping("/validate")
     public ApiRes validate() throws BizException {
-//        WxMaJscode2SessionResult session;
-//        try {
-//            session = wxMaService.getUserService().getSessionInfo(getValStringRequired("code"));
-//        } catch (WxErrorException e) {
-//            throw new BizException("登录失败，请重试");
-//        }
-        WxMaJscode2SessionResult session = new WxMaJscode2SessionResult();
-        session.setSessionKey("");
-        session.setOpenid("123");
-        session.setUnionid("");
+        WxMaJscode2SessionResult session;
+        try {
+            session = wxMaService.getUserService().getSessionInfo(getValStringRequired("code"));
+        } catch (WxErrorException e) {
+            throw new BizException("登录失败，请重试");
+        }
 
         // 返回前端 accessToken
         String accessToken = authService.auth(session);
