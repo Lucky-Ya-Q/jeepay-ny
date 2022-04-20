@@ -63,4 +63,20 @@ public class AuthController extends CommonCtrl {
 
         return ApiRes.ok4newJson(CS.ACCESS_TOKEN_NAME, accessToken);
     }
+
+    /**
+     * 用户信息认证 获取iToken 测试
+     **/
+    @PostMapping("/test")
+    public ApiRes test() throws BizException {
+        WxMaJscode2SessionResult session = new WxMaJscode2SessionResult();
+        session.setSessionKey("sessionKey");
+        session.setOpenid("openid");
+        session.setUnionid("unionid");
+
+        // 返回前端 accessToken
+        String accessToken = authService.auth(session);
+
+        return ApiRes.ok4newJson(CS.ACCESS_TOKEN_NAME, accessToken);
+    }
 }

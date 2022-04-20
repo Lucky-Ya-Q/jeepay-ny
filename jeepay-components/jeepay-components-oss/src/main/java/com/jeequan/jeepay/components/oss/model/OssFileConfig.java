@@ -38,6 +38,7 @@ public class OssFileConfig {
         String AVATAR = "avatar"; /** 用户头像 **/
         String IF_BG = "ifBG"; /** 接口类型卡片背景图片 **/
         String CERT = "cert";  /** 接口参数 **/
+        String PESTICIDE = "pesticide";  /** 农药 **/
     }
 
     /** 图片类型后缀格式 **/
@@ -57,6 +58,7 @@ public class OssFileConfig {
         ALL_BIZ_TYPE_MAP.put(BIZ_TYPE.AVATAR, new OssFileConfig(OssSavePlaceEnum.PUBLIC, IMG_SUFFIX, DEFAULT_MAX_SIZE) );
         ALL_BIZ_TYPE_MAP.put(BIZ_TYPE.IF_BG, new OssFileConfig(OssSavePlaceEnum.PUBLIC, IMG_SUFFIX, DEFAULT_MAX_SIZE) );
         ALL_BIZ_TYPE_MAP.put(BIZ_TYPE.CERT, new OssFileConfig(OssSavePlaceEnum.PRIVATE, new HashSet<>(Arrays.asList(ALL_SUFFIX_FLAG)), DEFAULT_MAX_SIZE) );
+        ALL_BIZ_TYPE_MAP.put(BIZ_TYPE.PESTICIDE, new OssFileConfig(OssSavePlaceEnum.PUBLIC, IMG_SUFFIX, DEFAULT_MAX_SIZE) );
     }
 
     /** 存储位置 **/
