@@ -21,4 +21,17 @@ public class JeeWxUser {
         this.setWxUser(wxUser);
         this.setCacheKey(cacheKey);
     }
+
+    public static JeeWxUser getCurrentWxUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+
+        try {
+            return (JeeWxUser) authentication.getPrincipal();
+        }catch (Exception e) {
+            return null;
+        }
+    }
 }
