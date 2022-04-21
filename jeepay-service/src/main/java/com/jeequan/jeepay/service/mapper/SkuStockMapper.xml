@@ -1,16 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jeequan.jeepay.service.mapper.SkuStockMapper">
-
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="com.jeequan.jeepay.core.entity.SkuStock">
-        <id column="sku_id" property="skuId" />
-        <result column="product_id" property="productId" />
-        <result column="mch_no" property="mchNo" />
-        <result column="name" property="name" />
-        <result column="price" property="price" />
-        <result column="deposit" property="deposit" />
-        <result column="stock" property="stock" />
+        <id column="sku_id" property="skuId"/>
+        <result column="mch_no" property="mchNo"/>
+        <result column="product_id" property="productId"/>
+        <result column="name_id" property="nameId"/>
+        <result column="name" property="name"/>
+        <result column="price" property="price"/>
+        <result column="deposit" property="deposit"/>
+        <result column="stock" property="stock"/>
     </resultMap>
 
+    <select id="pageProductSku" resultType="com.jeequan.jeepay.core.model.dto.ProductSkuDto">
+        select p.mch_no, p.product_id, p.name  product_name, p.description, p.pic, ss.sku_id, ss.name_id, ss.name sku_name, ss.price, ss.deposit, ss.stock
+        from r_sku_stock ss
+                 left join r_product p on ss.product_id = p.product_id
+        <where>
+            <if test="productSkuDto.productName != null and productSkuDto.productName != ''">
+                and p.name like concat('%', #{productSkuDto.productName}, '%')
+            </if>
+        </where>
+    </select>
 </mapper>

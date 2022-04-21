@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jeequan.jeepay.core.entity.Product;
 import com.jeequan.jeepay.core.entity.SkuStock;
 import com.jeequan.jeepay.service.mapper.ProductMapper;
+import com.jeequan.jeepay.service.mapper.SkuNameMapper;
 import com.jeequan.jeepay.service.mapper.SkuStockMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,8 @@ public class ProductService extends ServiceImpl<ProductMapper, Product> {
     private ProductMapper productMapper;
     @Autowired
     private SkuStockMapper skuStockMapper;
+    @Autowired
+    private SkuNameMapper skuNameMapper;
 
     @Transactional
     public void addProduct(Product product) {
@@ -48,13 +51,15 @@ public class ProductService extends ServiceImpl<ProductMapper, Product> {
             // 判断sku库存是否存在
             Integer count = skuStockMapper.selectCount(SkuStock.gw()
                     .eq(SkuStock::getProductId,product.getProductId())
-                    .eq(SkuStock::getName, skuStock.getName()));
+                    .eq(SkuStock::getNameId, skuStock.getNameId()));
             if (count > 0) {
                 throw new RuntimeException("规格名称已存在");
             }
             skuStock.setSkuId(null);
+            skuStock.setStock(0);
             skuStock.setProductId(product.getProductId());
             skuStock.setMchNo(product.getMchNo());
+            skuStock.setName(skuNameMapper.selectById(skuStock.getNameId()).getName());
             // 添加sku库存
             skuStockMapper.insert(skuStock);
         }
